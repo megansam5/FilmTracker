@@ -1,0 +1,34 @@
+@page "/userlogin/{groupId}"
+@using FilmTracker.Services
+@inject NavigationManager NavigationManager
+@inject IUserService UserService
+
+<body>
+<div class="header">
+    <h1>Group Code: @groupId</h1>
+    </div>
+
+<h2 class="add-user-title">Add New User</h2>
+<div class="user-input-section">
+    <input type="text" class="user-name-input" placeholder="Enter your name" @bind="Name"/>
+    <button @onclick="AddNewUser" class="enter-button">Create User</button>
+</div>
+
+</body>
+
+
+
+@code {
+    [Parameter]
+    public string groupId { get; set; }
+    private bool EditForm;
+    private string Name { get; set; }
+    //private int SelectedUserId { get; set; }
+
+    private async Task AddNewUser()
+    {
+        var groupIdInt = Int32.Parse(groupId);
+        var userId = await UserService.AddUser(Name, groupIdInt);
+        NavigationManager.NavigateTo($"film/{userId}");
+    }
+}

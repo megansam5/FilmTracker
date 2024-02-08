@@ -1,0 +1,160 @@
+﻿@page "/film/{SelectedUserId}"
+
+@using FilmTracker.Services
+@using FilmTracker.Models
+@inject IOmdbApiService OmdbApiService
+@inject IUserService UserService
+@inject NavigationManager NavigationManager
+@inject IMovieService MovieService
+<h3>Film</h3>
+@if (loggedInUser is not null)
+{
+    <p>Hello @loggedInUser.Name - group Id = @loggedInUser.GroupId</p>
+
+    <button @onclick="ChooseAnotherUser">Choose another user</button>
+@if (FavouriteMovies is not null)
+{
+    <h3>@FavouriteMovies.Count Favourite movies</h3>
+}
+    <button @onclick="ChangeFavouriteMovieView">View favourite movies</button>
+@if (SeeFavouriteMovies)
+{
+    if (FavouriteMovies.Count > 0)
+    {
+        foreach (var movie in FavouriteMovies)
+        {
+            <p>@movie.Title</p>
+            <img src="@movie.Poster" alt="movie poster"/>
+            <button @onclick="async () => await RemoveMovieFromFavourites(movie.imdbID)">Remove From Favourites</button>
+        }
+    }
+    else
+    {
+        <p>You dont have any favourite movies yet! Add some now!</p>
+    }
+    <button @onclick="ChangeFavouriteMovieView">Close</button>
+}
+    <h2>Movie search</h2>
+    <input type="text" placeholder="search" @bind="SearchQuery"/>
+    <button @onclick="SearchMovies">Search</button>
+@if (!MovieDetailsForm)
+{
+    if (movies is not null)
+    {
+        <ul>
+            @foreach (var movie in movies)
+            {
+                <li>@movie.Title</li>
+                <img src="@movie.Poster" alt="poster"/>
+                <button @onclick="() => GetMoreDetails(movie.imdbID)">More Details</button>
+                @if (FavouriteMovies.Any(m => m.UserId == loggedInUser.UserId && m.imdbID == movie.imdbID))
+                {
+                    <button @onclick="async () => await RemoveMovieFromFavourites(movie.imdbID)">Remove From Favourites</button>
+                }
+                else
+                {
+                    <button @onclick="async () => await AddMovieToFavourites(movie)">Add to favourites</button>
+                }
+
+            }
+        </ul>
+    }
+    else
+    {
+        <p>Search for a movie...</p>
+    }
+}
+else
+{
+    <h3>@movieDetails.Title</h3>
+    <img src="@movieDetails.Poster" alt="movie poster"/>
+    <p>Plot: @movieDetails.Plot</p>
+    <p>Genre: @movieDetails.Genre</p>
+    <p>Date Released: @movieDetails.Released</p>
+    <p>Director: @movieDetails.Director</p>
+    <p>Actors: @movieDetails.Actors</p>
+    <p>Imdb Rating: @movieDetails.imdbRating</p>
+    <p>Age Rating: @movieDetails.Rated</p>
+    <button @onclick="CloseDetails">Close</button>
+}
+}
+else
+{
+    <h2>loading...</h2>
+}
+<button @onclick="CompareMovies">Compare with other members of the group</button>
+
+
+@code {
+    [Parameter]
+    public string SelectedUserId { get; set; }
+    
+    private List<User>? users;
+    private User loggedInUser;
+    private List<MovieApi>? movies;
+    private string? SearchQuery;
+    private MovieDetailsApi movieDetails;
+    private bool MovieDetailsForm;
+    private List<Movie> FavouriteMovies;
+    private bool SeeFavouriteMovies;
+
+    protected override async Task OnInitializedAsync()
+    {
+        users = await UserService.GetAllUsers();
+        var userIdInt = Int32.Parse(SelectedUserId);
+        loggedInUser = users.Where(u => u.UserId == userIdInt).ToList().First();
+        movieDetails = new MovieDetailsApi();
+        MovieDetailsForm = false;
+        SeeFavouriteMovies = false;
+        FavouriteMovies = await MovieService.GetUserMovies(loggedInUser);
+    }
+
+    private async Task GetMoreDetails(string imdbID)
+    {
+        movieDetails = new MovieDetailsApi();
+        movieDetails = await OmdbApiService.GetMovieDetails(imdbID);
+        MovieDetailsForm = true;
+    }
+
+    private void ChangeFavouriteMovieView()
+    {
+        SeeFavouriteMovies = !SeeFavouriteMovies;
+    }
+
+    private void CloseDetails()
+    {
+        MovieDetailsForm = false;
+    }
+
+    public async Task SearchMovies()
+    {
+        if (SearchQuery is not null)
+        {
+            movies = await OmdbApiService.GetMovieListBySearch(SearchQuery);
+        }
+    }
+
+    public void ChooseAnotherUser()
+    {
+        NavigationManager.NavigateTo("/userlogin");
+    }
+
+    public async Task AddMovieToFavourites(MovieApi movie)
+    {
+        await MovieService.AddMovieToFavourites(loggedInUser, movie);
+        FavouriteMovies = await MovieService.GetUserMovies(loggedInUser);
+    }
+
+    public async Task RemoveMovieFromFavourites(string imdbID)
+    {
+        await MovieService.RemoveMovieFromFavourites(loggedInUser, imdbID);
+        FavouriteMovies = await MovieService.GetUserMovies(loggedInUser);
+    }
+
+    public void CompareMovies()
+    {
+        var groupId = loggedInUser.GroupId;
+        var userId = loggedInUser.UserId;
+        NavigationManager.NavigateTo($"comparison/{groupId}/{userId}");
+    }
+}

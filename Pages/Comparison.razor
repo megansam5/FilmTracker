@@ -1,0 +1,94 @@
+@page "/comparison/{groupId}/{userId}"
+@using FilmTracker.Models
+@using FilmTracker.Services
+@inject IUserService UserService
+@inject IComparisonService ComparisonService
+@inject NavigationManager NavigationManager
+<h3>Comparison</h3>
+@if (users is not null)
+{
+    @foreach (var user in users)
+    {
+        <div>
+            <label>
+                <input type="checkbox" @onclick="() =>  UpdateSelectedUsers(user)">
+                <span class="employee-toggle">
+                    <span>@user.Name</span>
+                </span>
+            </label>
+        </div>
+    }
+        
+    <h3>Selected Users:</h3>
+    <ul>
+        @foreach (var selectedUser in selectedUsers)
+        {
+            <li>@selectedUser.Name</li> 
+        }
+    </ul>
+    <button @onclick="CompareMovies">Compare Movies</button>
+    if (comparedMoves is not null)
+    {
+        if (comparedMoves.Count > 0)
+        {
+            <h3>Similar Movies</h3>
+            <ul>
+                @foreach (var movie in comparedMoves)
+                {
+                    <li>@movie.Title</li>
+                    <img width="100px" src="@movie.Poster" alt="movie poster"/>
+                }
+            </ul>
+        }
+        else
+        {
+            <h4>Sorry no similar movies</h4>
+        }
+    }
+    <button @onclick="BackToAddingFilms">Add more films</button>
+}
+
+@code {
+    [Parameter]
+    public string groupId { get; set; }
+    [Parameter]
+    public string userId { get; set; }
+    
+    private List<User>? users;
+    private List<User> selectedUsers = new();
+    private List<Movie>? comparedMoves;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var groupIdInt = Int32.Parse(groupId);
+        users = await UserService.GetAllUsersInGroup(groupIdInt);
+
+    }
+
+
+    
+    public void UpdateSelectedUsers(User userToAdd)
+    {
+        if (selectedUsers.Any(u => u == userToAdd))
+        {
+            selectedUsers.Remove(userToAdd);
+        }
+        else
+        {
+            selectedUsers.Add(userToAdd);
+        }
+    }
+
+    public async Task CompareMovies()
+    {
+        if (selectedUsers.Count > 0)
+        {
+            comparedMoves = await ComparisonService.CompareUserMovies(selectedUsers);
+        }
+    }
+    
+    public void BackToAddingFilms()
+    {
+        NavigationManager.NavigateTo($"film/{userId}");
+    }
+}

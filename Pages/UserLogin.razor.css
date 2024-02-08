@@ -1,0 +1,50 @@
+/* Style the entire content */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+/* Style the heading bar at the top */
+.header {
+    background-color: #007bff; /* Header background color */
+    color: #fff; /* Text color in the header */
+    padding: 10px 0;
+    text-align: center;
+}
+
+/* Style the "Add New User" title */
+.add-user-title {
+    font-size: 24px;
+    margin-top: 20px;
+    text-align: center;
+}
+
+/* Style the user input section */
+.user-input-section {
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* Style the input field */
+.user-name-input {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+    max-width: 300px; /* Adjust the maximum width as needed */
+    margin: 0 auto; /* Center the input field horizontally */
+}
+
+/* Style the "Enter" button */
+.enter-button {
+    padding: 10px 20px;
+    background-color: #28a745; /* Button background color */
+    color: #fff; /* Button text color */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 20px;
+    display: inline-block;
+}

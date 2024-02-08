@@ -1,0 +1,18 @@
+CREATE TABLE UserTable
+(
+    UserId      int             NOT NULL IDENTITY (1000, 1) PRIMARY KEY,
+    Name        nvarchar(255)   NOT NULL,
+    GroupId     int             NOT NULL
+)
+GO
+
+CREATE TABLE Movies
+(
+    Title    nvarchar(255)   NOT NULL,
+    imdbID   nvarchar(255)   NOT NULL,
+	UserId   int             NOT NULL,
+	Poster   nvarchar(255)   NOT NULL,
+    CONSTRAINT PK_Movies PRIMARY KEY CLUSTERED (UserId ASC, imdbID ASC)
+)
+
+GO

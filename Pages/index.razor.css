@@ -1,0 +1,64 @@
+/* Center the entire content vertically and horizontally */
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #f5f5f5; /* Background color of the page */
+}
+
+/* Style the "Film Tracker" title */
+h1 {
+    font-size: 36px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+/* Style the "Add to Group" section */
+.add-group-section {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Style the input and button inside the "Add to Group" section */
+.add-group-input {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.add-group-button {
+    padding: 10px 20px;
+    background-color: #007bff; /* Button background color */
+    color: #fff; /* Button text color */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.add-group-button:hover {
+    background-color: #0169d9;
+}
+
+/* Style the "Create New Group" button */
+.create-group-button {
+    padding: 10px 20px;
+    background-color: #28a745; /* Button background color */
+    color: #fff; /* Button text color */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.create-group-button:hover{
+    background-color: #228d3b;
+}
+
+.create-group-button-container {
+    text-align: center;
+}

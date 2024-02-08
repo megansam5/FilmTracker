@@ -1,0 +1,37 @@
+﻿@page "/"
+
+@using FilmTracker.Services
+@inject IGroupService GroupService
+@inject NavigationManager NavigationManager
+
+<body>
+<h1>Compare Movies</h1>
+<div class="add-group-section">
+    <h3>Add your group</h3>
+    <InputNumber class="add-group-input" TValue="int" @bind-Value="_knownGroupId" placeholder="Enter your group code"/>
+    <button class="add-group-button" @onclick="CheckAndJoin">Join Group</button>
+</div>
+
+<div class="create-group-button-container">
+    <h4>Or create a new group</h4>
+    <button class="create-group-button" @onclick="CreateNew"> Create</button>
+</div>
+
+</body>
+@code {
+    private int _knownGroupId;
+
+    public async Task CheckAndJoin()
+    {
+        if (await GroupService.CheckGroupIdIsValid(_knownGroupId))
+        {
+            NavigationManager.NavigateTo($"userlogin/{_knownGroupId}");
+        }
+    }
+
+    public async Task CreateNew()
+    {
+        var groupId = await GroupService.GenerateNewCode();
+        NavigationManager.NavigateTo($"userlogin/{groupId}");
+    }
+}
